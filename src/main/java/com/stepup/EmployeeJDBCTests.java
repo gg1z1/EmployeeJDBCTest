@@ -27,7 +27,7 @@ public class EmployeeJDBCTests {
 
             // Задача 3: Подсчет сотрудников в IT-отделе
             //int itEmployeesCount = countITEmployees(connection);
-            countITEmployees();
+            countITEmployees(connection);
 
         } catch (SQLException e) {
             System.err.println("Ошибка при работе с базой данных: " + e.getMessage());
@@ -135,13 +135,12 @@ public class EmployeeJDBCTests {
         }
     }
 
-    public static void countITEmployees() {
+    public static void countITEmployees(Connection connection) {
         String sql = "SELECT COUNT(*) as employeeCount " +
                 "FROM Employee " +
                 "WHERE DEPARTMENTID = (SELECT ID FROM Department WHERE NAME = 'IT')";
 
-        try (Connection connection = getConnection();
-             Statement statement = connection.createStatement();
+        try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
 
             if (resultSet.next()) {
