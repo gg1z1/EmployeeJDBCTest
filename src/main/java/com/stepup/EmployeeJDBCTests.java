@@ -16,18 +16,25 @@ public class EmployeeJDBCTests {
 
             System.out.println("\nМетаданные таблицы Employee:");
             getTableMetadata("Employee".toUpperCase());
-            System.out.println("\nМетаданные таблицы DEPARTMENT:");
-            getTableMetadata("DEPARTMENT".toUpperCase());
+            //System.out.println("\nМетаданные таблицы DEPARTMENT:");
+            //getTableMetadata("DEPARTMENT".toUpperCase());
 
             // Задача 1: Найти ID сотрудника Ann и установить департамент в HR
-            findAndUpdateAnnDepartment(connection);
+            //findAndUpdateAnnDepartment(connection);
 
             // Задача 2: Исправить имена сотрудников с маленькой буквы
-            correctEmployeeNames(connection);
+            //correctEmployeeNames(connection);
 
             // Задача 3: Подсчет сотрудников в IT-отделе
             //int itEmployeesCount = countITEmployees(connection);
-            countITEmployees(connection);
+            //countITEmployees(connection);
+
+            //
+            checkDepartmentDeletion(connection, "HR", 3);
+
+            printEmployeeTable(connection);
+
+            //showDatabaseInfo(connection);
 
         } catch (SQLException e) {
             System.err.println("Ошибка при работе с базой данных: " + e.getMessage());
@@ -151,5 +158,100 @@ public class EmployeeJDBCTests {
         } catch (SQLException e) {
             System.err.println("Ошибка при подсчете сотрудников: " + e.getMessage());
         }
+    }
+
+    public static void checkDepartmentDeletion(Connection connection, String departmentName, int departmentId) throws SQLException {
+        // Проверяем количество сотрудников по имени отдела
+        int employeeCountByName = getEmployeeCountByDepartmentName(connection, departmentName);
+
+        // Проверяем количество сотрудников по ID отдела
+        int employeeCountById = getEmployeeCountByDepartmentId(connection, departmentId);
+
+        if (employeeCountByName == 0 && employeeCountById == 0) {
+            System.out.println("Требование выполнено: все сотрудники удалены");
+        } else {
+            System.out.println("Требование НЕ выполнено!");
+            if (employeeCountByName > 0) System.out.println("По имени отдела осталось " + employeeCountByName + " сотрудников");
+            if (employeeCountById > 0) System.out.println("По ID отдела осталось " + employeeCountById + " сотрудников");
+        }
+    }
+
+    private static int getEmployeeCountByDepartmentName(Connection connection, String departmentName) throws SQLException {
+        String sql = "SELECT COUNT(*) as employeeCount " +
+                "FROM Employee e " +
+                "JOIN Department d ON e.DEPARTMENTID = d.ID " +
+                "WHERE d.NAME = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, departmentName);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) return rs.getInt("employeeCount");
+        }
+        return 0;
+    }
+
+    private static int getEmployeeCountByDepartmentId(Connection connection, int departmentId) throws SQLException {
+        String sql = "SELECT COUNT(*) as employeeCount " +
+                "FROM Employee " +
+                "WHERE DEPARTMENTID = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, departmentId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) return rs.getInt("employeeCount");
+        }
+        return 0;
+    }
+
+    public static void printEmployeeTable(Connection connection) throws SQLException {
+        String sql = "SELECT ID, NAME, DEPARTMENTID FROM Employee";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            // Выводим заголовок таблицы
+            System.out.println("| ID     | NAME                                   | DEPARTMENTID |");
+            System.out.println("|--------|-----------------------------------------|-------------|");
+
+            // Выводим данные
+            while (rs.next()) {
+                int id = rs.getInt("ID");
+                String name = rs.getString("NAME");
+                int departmentId = rs.getInt("DEPARTMENTID");
+
+                // Форматируем вывод для лучшей читаемости
+                System.out.printf("| %-6d | %-30s | %-12d |%n",
+                        id,
+                        name,
+                        departmentId);
+            }
+        }
+    }
+
+    public static void showDatabaseInfo(Connection connection) throws SQLException {
+        // Получаем метаданные подключения
+        DatabaseMetaData metaData = connection.getMetaData();
+
+        // Выводим основную информацию о БД
+        System.out.println("Информация о базе данных:");
+        System.out.println("-------------------------");
+
+        // Информация о драйвере
+        System.out.println("Драйвер:");
+        System.out.println("  Имя: " + metaData.getDriverName());
+        System.out.println("  Версия: " + metaData.getDriverVersion());
+
+        // Информация о БД
+        System.out.println("\nБаза данных:");
+        System.out.println("  Имя: " + metaData.getDatabaseProductName());
+        System.out.println("  Версия: " + metaData.getDatabaseProductVersion());
+
+        // Информация о URL подключения
+        System.out.println("\nURL подключения: " + connection.getMetaData().getURL());
+
+        // Информация о пользователе
+        System.out.println("\nПользователь: " + connection.getMetaData().getUserName());
     }
 }
