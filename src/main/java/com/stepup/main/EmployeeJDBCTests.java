@@ -1,4 +1,4 @@
-package com.stepup;
+package com.stepup.main;
 
 import java.sql.*;
 

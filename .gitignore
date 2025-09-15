@@ -3,6 +3,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+
+/*.mv.db
+/*.trace.db
+
 ### IntelliJ IDEA ###
 .idea/
 .idea/modules.xml
@@ -37,3 +41,4 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
