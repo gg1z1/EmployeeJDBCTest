@@ -7,6 +7,12 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
 public class MainPage extends BasePage {
+
+    private static final String[] EXPECTED_TITLES = {
+            "Авиакомпания «Победа» - купить авиабилеты онлайн, дешёвые билеты на самолёт, прямые и трансферные рейсы с пересадками",
+            "Pobeda Airlines - buy cheap plane tickets online, direct and transfer flights"
+    };
+
     // Локаторы элементов
     @FindBy(css = "title")
     private WebElement pageTitle;
@@ -33,8 +39,10 @@ public class MainPage extends BasePage {
 
     // Проверка заголовка страницы
     public boolean checkPageTitle() {
-        //waitForElement(pageTitle);
-        return driver.getTitle().equals("Авиакомпания «Победа» - купить авиабилеты онлайн, дешёвые билеты на самолёт, прямые и трансферные рейсы с пересадками");
+        String currentTitle = driver.getTitle();
+        for (String expectedTitle : EXPECTED_TITLES)
+            if (currentTitle.equals(expectedTitle)) return true;
+        return false;
     }
 
     // Проверка наличия логотипа
