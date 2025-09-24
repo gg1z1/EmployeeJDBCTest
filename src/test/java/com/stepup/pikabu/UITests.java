@@ -1,4 +1,4 @@
-package com.stepup.app;
+package com.stepup.pikabu;
 
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
