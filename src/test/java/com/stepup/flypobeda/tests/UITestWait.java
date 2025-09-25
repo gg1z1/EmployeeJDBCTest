@@ -1,4 +1,4 @@
-package com.stepup.flypobeda;
+package com.stepup.flypobeda.tests;
 
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
