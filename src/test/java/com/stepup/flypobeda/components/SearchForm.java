@@ -8,6 +8,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.Color;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -65,18 +66,42 @@ public class SearchForm {
     @FindBy(css = "main > div > div:nth-child(4) > div > div > div > button > span")
     private WebElement middleElement;
 
-    //main > div > div:nth-child(4) > div > div > div > button > span
+    //форма поиска, переключение в режим поиска бронирования
+    @FindBy(css = "[class*='tabsControl'] button:nth-child(3)")
+    private WebElement tab3BookingSearch;
+
+    @FindBy(css = "form > div > div:nth-child(1) input")
+    private WebElement input1Familia;
+
+    @FindBy(css = "form > div > div:nth-child(2) input")
+    private WebElement input2BookingNumber;
+
+    @FindBy(css = "[class*='submit']")
+    private WebElement submitButton;
+
+    //checkbox
+    @FindBy(className = "customCheckbox")
+    private WebElement checkbox;
+
+    //.message_error
+    @FindBy(className = "message_error")
+    private WebElement errorMessage;
 
 
     public void setFrom(String city) {
-        fromField.sendKeys(city);
         scrollToElement(middleElement);
+
+        fromField.clear();
+        fromField.sendKeys(city);
+        waitForElementToBeVisible(menuitem);
         menuitem.click();
     }
 
     public void setTo(String city) {
-        toField.sendKeys(city);
         scrollToElement(middleElement);
+        toField.clear();
+        toField.sendKeys(city);
+        waitForElementToBeVisible(menuitem);
         menuitem.click();
     }
 
@@ -105,8 +130,46 @@ public class SearchForm {
                 });
     }
 
+    public void waitForElementToBeVisible(WebElement element) {
+        new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(ExpectedConditions.visibilityOf(element));
+    }
+
+
     public void scrollToElement(WebElement element){
         Actions actions = new Actions(driver);
         actions.moveToElement(element).perform();
+    }
+
+    public void switchToBookingSearchMode() {
+        tab3BookingSearch.click();
+    }
+
+    public void fillSearchForm(String orderNumber, String surname) {
+
+        input1Familia.clear();
+        input1Familia.sendKeys(surname);
+        input2BookingNumber.clear();
+        input2BookingNumber.sendKeys(orderNumber);
+    }
+
+    public String getFamiliaInputText(){
+        return input1Familia.getAttribute("placeholder");
+    }
+
+    public String getBookingNumberText(){
+        return input2BookingNumber.getAttribute("placeholder");
+    }
+
+    public String getSubmitButtonText(){
+        return submitButton.getText();
+    }
+
+    public void setCheckBox(){
+        checkbox.click();
+    }
+
+    public String getErrorMessage(){
+       return errorMessage.getText();
     }
 }

@@ -2,24 +2,27 @@ package com.stepup.flypobeda.tests;
 
 import com.stepup.flypobeda.pages.MainPage;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestMainPage {
-    private static WebDriver driver;
-    private static MainPage mainPage;
+    private WebDriver driver;
+    private MainPage mainPage;
 
-    @BeforeAll
-    public static void setUp() {
+    @BeforeEach
+    public void setUp() {
         driver = new ChromeDriver();
         driver.get("https://www.flypobeda.ru/");
         mainPage = new MainPage(driver);
+        mainPage.closeAdsAndPolicy();
     }
 
     @Test
@@ -56,9 +59,61 @@ public class TestMainPage {
                     mainPage.getSearchForm().getColorFromDateHighlighter());
     }
 
+    @Test
+    public void negativeTestBookingSearchForm (){
+        //action
+        mainPage.getSearchForm().switchToBookingSearchMode();
 
-    @AfterAll
-    public static void tearDown() {
+        assertEquals("Фамилия клиента"
+                ,mainPage.getSearchForm().getFamiliaInputText());
+        assertEquals("Номер бронирования или билета"
+                ,mainPage.getSearchForm().getBookingNumberText());
+        assertEquals("ПОИСК"
+                ,mainPage.getSearchForm().getSubmitButtonText());
+
+        mainPage.getSearchForm().fillSearchForm("XXXXXX", "Qwerty");
+        mainPage.getSearchForm().clickSearch();
+
+        // Сохраняем handle основной вкладки
+        String mainWindow = driver.getWindowHandle();
+
+        // Ждем появления новой вкладки
+        new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(ExpectedConditions.numberOfWindowsToBe(2));
+
+        // Перебираем все вкладки и находим нужную по URL
+        for (String windowHandle : driver.getWindowHandles()) {
+            driver.switchTo().window(windowHandle);
+            if (driver.getCurrentUrl().contains("ticket.flypobeda.ru/websky")) {
+                break;
+            }
+        }
+
+        assertTrue(driver.getCurrentUrl().contains("ticket.flypobeda.ru/websky"));
+
+        mainPage.getHeadInfo().waitForPageTitle("Просмотр заказа");
+
+        assertEquals("Просмотр заказа"
+                ,mainPage.getHeadInfo().getCurrentTitle()
+                ,"Title не совпадают");
+
+        mainPage.getSearchForm().setCheckBox();
+        mainPage.getSearchForm().clickSearch();
+
+        assertEquals("Заказ с указанными параметрами не найден",
+                mainPage.getSearchForm().getErrorMessage());
+
+//        try {
+//            Thread.sleep(20000); // Пауза на 2 секунды
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
+        }
+
+
+    @AfterEach
+    public void tearDown() {
         driver.quit();
     }
 }

@@ -4,6 +4,8 @@ import com.stepup.flypobeda.components.HeadInfo;
 import com.stepup.flypobeda.components.SearchForm;
 import com.stepup.flypobeda.components.Header;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
 import java.util.HashMap;
@@ -18,17 +20,28 @@ public class MainPage extends BasePage {
         EXPECTED_TITLES.put("EN", "Pobeda Airlines - buy cheap plane tickets online, direct and transfer flights");
     }
 
-    private HeadInfo headInfo;
-    private SearchForm searchForm;
-    private Header header;
+        private HeadInfo headInfo;
+        private SearchForm searchForm;
+        private Header header;
 
-    public MainPage(WebDriver driver) {
-        super(driver);
-        PageFactory.initElements(driver, this);
-        this.headInfo = new HeadInfo(driver);
-        this.header = new Header(driver);
-        this.searchForm = new SearchForm(driver);
-    }
+        public MainPage(WebDriver driver) {
+            super(driver);
+            PageFactory.initElements(driver, this);
+            this.headInfo = new HeadInfo(driver);
+            this.header = new Header(driver);
+            this.searchForm = new SearchForm(driver);
+        }
+
+    //$("[data-testid='ads-popup-close-icon']")
+
+    //$("[data-testid='policy-popup-close-icon']")
+
+    @FindBy(css = "[data-testid='ads-popup-close-icon']")
+    private WebElement adsCloseButton;
+
+    @FindBy(css = "[data-testid='policy-popup-close-icon']")
+    private WebElement policyCloseButton;
+
 
     public HeadInfo getHeadInfo() {
         return headInfo;
@@ -38,13 +51,17 @@ public class MainPage extends BasePage {
         return header;
     }
 
-
     public SearchForm getSearchForm() {
         return searchForm;
     }
 
     public String getExpectedTitle(String languageTitle){
         return EXPECTED_TITLES.get(languageTitle);
+    }
+
+    public void closeAdsAndPolicy(){
+        adsCloseButton.click();
+        policyCloseButton.click();
     }
 
 }
