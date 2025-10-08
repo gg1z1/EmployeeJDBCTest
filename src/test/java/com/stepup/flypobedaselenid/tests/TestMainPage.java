@@ -4,6 +4,9 @@ import com.codeborne.selenide.Selenide;
 import com.stepup.flypobedaselenid.components.HeaderPage;
 import com.stepup.flypobedaselenid.components.SearchFormPage;
 import com.stepup.flypobedaselenid.pages.MainPage;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WindowType;
@@ -15,6 +18,8 @@ import static com.codeborne.selenide.WebDriverConditions.urlContaining;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+
+@Epic("Функциональное тестирование главной страницы")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TestMainPage {
 
@@ -30,6 +35,8 @@ public class TestMainPage {
     }
 
     @Test
+    @Feature("Проверка элементов главной страницы")
+    @DisplayName("Проверка заголовка, логотипа и всплывающего меню")
     public void testMainPage() {
         // Проверка заголовка страницы
         String expectedTitle = mainPage.getExpectedTitle(headerPage.getLanguage());
@@ -47,6 +54,8 @@ public class TestMainPage {
     }
 
     @Test
+    @Feature("Негативное тестирование формы поиска")
+    @DisplayName("Проверка валидации формы поиска при некорректных данных")
     public void negativeTestSearchForm() {
         // Заполняем форму поиска
         searchFormPage.setFrom("Санкт-Петербург");
@@ -58,6 +67,8 @@ public class TestMainPage {
     }
 
     @Test
+    @Feature("Проверка поиска бронирования")
+    @DisplayName("Тестирование работы формы поиска бронирования")
     public void negativeTestBookingSearch() {
         // Переключаемся в режим поиска бронирования
         searchFormPage.switchToBookingMode();
@@ -91,8 +102,4 @@ public class TestMainPage {
         assertEquals("Заказ с указанными параметрами не найден", errorText);
     }
 
-//    @AfterAll
-//    public void tearDown() {
-//        Selenide.closeWindow();
-//    }
 }
